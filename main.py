@@ -26,7 +26,7 @@ def setCESTdefaults(dt = 1e-3,
 
     m = PElines/accFactor
    
-    gamma = 2*pi*42.6e6 # rad/(s T)
+    gamma = 2*np.pi*42.6e6 # rad/(s T)
     B0 = 7.0 #Tesla
     omega0 = gamma * B0
     omega1 = gamma * B1
@@ -42,7 +42,7 @@ def setCESTdefaults(dt = 1e-3,
 
     sequenceParams = [satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta]
     physicsVariables = [B0, omega1, domegaSpecies,  M0a, M0b, T1a, T2a, T1b, T2b, ka, kb]
-    Mstart = array([0,0,0,0,M0a,M0b,1.])
+    Mstart = numpy.array([0,0,0,0,M0a,M0b,1.])
     
     print 'sequenceParams : [satDur = {0}, ti = {1}, tacq = {2}, tpresat = {3}, accFactor = {4}, tinterfreq = {5}, hardTheta = {6}, m = {7}, dt = {8}, delta = {9}]'.format(satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta)
     print 'physicsVariables : [B0 = {0}, omega1 = {1}, domegaSpecies = {2},  M0a = {3}, M0b = {4}, T1a = {5}, T2a = {6}, T1b = {7}, T2b = {8}, ka = {9}, kb = {10}]'.format(B0, omega1, domegaSpecies,  M0a, M0b, T1a, T2a, T1b, T2b, ka, kb)
