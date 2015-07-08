@@ -53,19 +53,19 @@ def setCESTdefaults(dt = 1e-3,
 def xrot(phi):
     return np.array([[1,0,0,0,0,0,0],
                         [0,1,0,0,0,0,0],
-                        [0,0,cos(phi),0,sin(phi),0,0],
-                        [0,0,0,cos(phi),0,sin(phi),0],
-                        [0,0,-sin(phi),0,cos(phi),0,0],
-                        [0,0,0,-sin(phi),0,cos(phi),0],
+                        [0,0,np.cos(phi),0,np.sin(phi),0,0],
+                        [0,0,0,np.cos(phi),0,np.sin(phi),0],
+                        [0,0,-np.sin(phi),0,np.cos(phi),0,0],
+                        [0,0,0,-np.sin(phi),0,np.cos(phi),0],
                         [0,0,0,0,0,0,1],])
 
 def yrot(phi):
-    return np.array([[cos(phi),0,0,0,-sin(phi),0,0],
-                        [0,cos(phi),0,0,0,-sin(phi),0],
+    return np.array([[np.cos(phi),0,0,0,-np.sin(phi),0,0],
+                        [0,np.cos(phi),0,0,0,-np.sin(phi),0],
                         [0,0,1,0,0,0,0],
                         [0,0,0,1,0,0,0],
-                        [sin(phi),0,0,0,cos(phi),0,0],
-                        [0,sin(phi),0,0,0,cos(phi),0],
+                        [np.sin(phi),0,0,0,np.cos(phi),0,0],
+                        [0,np.sin(phi),0,0,0,np.cos(phi),0],
                         [0,0,0,0,0,0,1]])
 
 def zrot(phi):
