@@ -208,7 +208,9 @@ def setAlterFreqs():
     for i in range(len(freqs)):
         freqs[i] = float(freqs[i])
     return freqs
-
+    
+freqs = setAlterFreqs()
+Mstart, physicsVariables, sequenceParams = setCESTdefaults(1e-6)
 
 def zspectrum_N(params,
                 freqs):
