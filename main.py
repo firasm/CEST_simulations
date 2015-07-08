@@ -186,7 +186,7 @@ def cestSequence(Mstart,
 
 
 def Zspectrum(freqs, 
-              Mstart, sequenceParams):
+              Mstart, sequenceParams, physicsVariables):
 
     signals = []
     Mresults = []

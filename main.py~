@@ -113,7 +113,7 @@ def freePrecessTwoPool(Mresult,
 
 
 
-def cestSequenceEPI(Mstart, 
+def cestSequence(Mstart, 
                     physicsVariables, 
                     sequenceParams):
     
