@@ -186,7 +186,7 @@ def cestSequenceEPI(Mstart,
 
 
 def Zspectrum(freqs, 
-              Mstart):
+              Mstart, sequenceParams):
 
     signals = []
     Mresults = []
