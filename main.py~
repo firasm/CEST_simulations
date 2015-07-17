@@ -1,7 +1,6 @@
 ##Collection of code to simulate CEST sequences
 
 import numpy as np
-from numpy import *
 
 def setCESTdefaults(dt = 1e-3, 
                     satDur = 4000, 
@@ -266,7 +265,7 @@ def setCESTdefaultsMP(dt = 1e-4,
                       M0w = 1.0,
                       relaxationTimes = [2.0,0.05,  1.5,0.05,  1.5,0.05,  1.0,0.05,  1.0,0.05,  1.0,0.05,  1.0,0.05],
                       relativeConcentrations = [1.0, 0.0015, 0.0015, 0, 0, 0, 0],
-                      exchangeRates = array([0, 200., 20., 0, 0, 0, 0]),
+                      exchangeRates = np.array([0, 200., 20., 0, 0, 0, 0]),
                       resonanceFrequencies = [0., 3.5, -3.5, 0, 0, 0, 0],
                       avePower = 1.0e-6,
                       dutyCycle = 0.5,

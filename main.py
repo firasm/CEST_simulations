@@ -2,6 +2,11 @@
 
 import numpy as np
 
+
+gamma = 2*np.pi*42.6e6 # rad/(s T)
+B0 = 7.0 #Tesla
+omega0 = gamma * B0
+
 def setCESTdefaults(dt = 1e-3, 
                     satDur = 4000, 
                     B1 = 1.0e-6, 
@@ -208,6 +213,9 @@ def setAlterFreqs():
     for i in range(len(freqs)):
         freqs[i] = float(freqs[i])
 
+    gamma = 2*np.pi*42.6e6 # rad/(s T)
+    B0 = 7.0 #Tesla
+    omega0 = gamma * B0
     ppms = np.array(freqs)/omega0*1e6
     ppmsorted = sort(ppms)
     inds = [list(ppms).index(c) for c in ppmsorted]
