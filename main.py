@@ -217,7 +217,7 @@ def setAlterFreqs():
     B0 = 7.0 #Tesla
     omega0 = gamma * B0
     ppms = np.array(freqs)/omega0*1e6
-    ppmsorted = sort(ppms)
+    ppmsorted = np.sort(ppms)
     inds = [list(ppms).index(c) for c in ppmsorted]
 
     return freqs, ppmsorted, inds
