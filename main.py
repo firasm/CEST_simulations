@@ -1,6 +1,7 @@
 ##Collection of code to simulate CEST sequences
 
 import numpy as np
+from numpy import *
 
 def setCESTdefaults(dt = 1e-3, 
                     satDur = 4000, 
