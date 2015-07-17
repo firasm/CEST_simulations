@@ -23,7 +23,7 @@ def setCESTdefaults(dt = 1e-3,
                     T1b = 1.5, 
                     T2b = 0.05, 
                     kb = 20.0):
-
+    
     m = PElines/accFactor
    
     gamma = 2*np.pi*42.6e6 # rad/(s T)
@@ -53,19 +53,19 @@ def setCESTdefaults(dt = 1e-3,
 def xrot(phi):
     return np.array([[1,0,0,0,0,0,0],
                         [0,1,0,0,0,0,0],
-                        [0,0,cos(phi),0,sin(phi),0,0],
-                        [0,0,0,cos(phi),0,sin(phi),0],
-                        [0,0,-sin(phi),0,cos(phi),0,0],
-                        [0,0,0,-sin(phi),0,cos(phi),0],
+                        [0,0,np.cos(phi),0,np.sin(phi),0,0],
+                        [0,0,0,np.cos(phi),0,np.sin(phi),0],
+                        [0,0,-np.sin(phi),0,np.cos(phi),0,0],
+                        [0,0,0,-np.sin(phi),0,np.cos(phi),0],
                         [0,0,0,0,0,0,1],])
 
 def yrot(phi):
-    return np.array([[cos(phi),0,0,0,-sin(phi),0,0],
-                        [0,cos(phi),0,0,0,-sin(phi),0],
+    return np.array([[np.cos(phi),0,0,0,-np.sin(phi),0,0],
+                        [0,np.cos(phi),0,0,0,-np.sin(phi),0],
                         [0,0,1,0,0,0,0],
                         [0,0,0,1,0,0,0],
-                        [sin(phi),0,0,0,cos(phi),0,0],
-                        [0,sin(phi),0,0,0,cos(phi),0],
+                        [np.sin(phi),0,0,0,np.cos(phi),0,0],
+                        [0,np.sin(phi),0,0,0,np.cos(phi),0],
                         [0,0,0,0,0,0,1]])
 
 def zrot(phi):
@@ -116,7 +116,8 @@ def freePrecessTwoPool(Mresult,
 def cestSequence(Mstart, 
                     physicsVariables, 
                     sequenceParams):
-    
+    ## Takes a starting magnetization state and evolves it under the influence of a saturation pulse and imaging sequence
+
     [satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta] = sequenceParams
     [B0, omega1, domegaSpecies,  M0a, M0b, T1a, T2a, T1b, T2b, ka, kb] = physicsVariables
     
@@ -187,7 +188,8 @@ def cestSequence(Mstart,
 
 def Zspectrum(freqs, 
               Mstart, sequenceParams, physicsVariables):
-
+    ## Iterates cestSequence over a list of frequency offsets
+    ## Returns the magnetization history and the signal magnitudes for each offset
     signals = []
     Mresults = []
     for freq in freqs:
@@ -200,6 +202,7 @@ def Zspectrum(freqs,
     return Mresult, signals
 
 def setAlterFreqs():
+    ## Generates an alternating frequency offset list, to be iterated over using the cest sequence function
     freqs = []
     for i in range(-10000, 0, 300):
         freqs.append(i)
@@ -207,7 +210,12 @@ def setAlterFreqs():
 
     for i in range(len(freqs)):
         freqs[i] = float(freqs[i])
-    return freqs
+
+    ppms = np.array(freqs)/omega0*1e6
+    ppmsorted = sort(ppms)
+    inds = [list(ppms).index(c) for c in ppmsorted]
+
+    return freqs, ppmsorted, inds
 
 
 def zspectrum_N(params,
@@ -243,5 +251,68 @@ param_dict = {'water': [-.7, 0,0.6],
 params_passed = [1.0]+\
                 param_dict['water']+\
                 param_dict['A']
+
+###################################################################################################################
+################################ Starting Multi-Pool/Pulsed-Saturation Code #######################################
+###################################################################################################################
+
+def setCESTdefaultsMP(dt = 1e-4,
+                      ti = 5,
+                      tacq = 10,
+                      tpresat = 50,
+                      accFactor = 1,
+                      tinterfreq = 0,
+                      hardTheta = np.pi/2,
+                      PElines = 1,
+                      delta = 0.0,
+                      M0w = 1.0,
+                      relaxationTimes = [2.0,0.05,  1.5,0.05,  1.5,0.05,  1.0,0.05,  1.0,0.05,  1.0,0.05,  1.0,0.05],
+                      relativeConcentrations = [1.0, 0.0015, 0.0015, 0, 0, 0, 0],
+                      exchangeRates = array([0, 200., 20., 0, 0, 0, 0]),
+                      resonanceFrequencies = [0., 3.5, -3.5, 0, 0, 0, 0],
+                      avePower = 1.0e-6,
+                      dutyCycle = 0.5,
+                      n = 80,
+                      theta = 360,
+                      ):
+    
+    m = PElines/accFactor
+    
+    gamma = 2*pi*42.6e6 # rad/(s T)
+    B0 = 7.0 #Tesla
+    omega0 = gamma * B0
+
+    reverseExchanges = [relativeConcentrations[i]*exchangeRates[i] for i in range(7)] #kwa = M0a/M0w*kaw
+    
+    
+    Mstart = []
+    for i in range(7):
+        Mstart.append(0) #x
+        Mstart.append(0) #y
+        Mstart.append(M0w*relativeConcentrations[i])
+        
+    tr = find_tr(dt, dutyCycle, theta, avePower)/dt   # in seconds, divided by dt yields number of points in pulse
+    satSequence = predefinedSatSequence(dt, tr, dutyCycle, n, theta, varianGaussian)
+    satDur = len(satSequence)
+    
+    omega1 = gamma*satSequence
+    
+    sequenceParams = [satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta]
+    physicsVariables = [B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges]
+
+    
+    #print 'sequenceParams = [satDur = {0}, ti = {1}, tacq = {2}, tpresat = {3}, accFactor = {4}, tinterfreq = {5}, hardTheta = {6}, m = {7}, dt = {8}, delta = {9}]'.format(satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta)
+    #print 'physicsVariables = [B0 = {0}, omega0 = {1}, omega1 = {2}, M0w = {3}, relaxationTimes = {4}, exchangeRates = {5}, \
+    #relativeConcentrations = {6}, resonanceFrequencies = {7}, reverseEchanges = {8}]'.format(B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges)
+    return Mstart, physicsVariables, sequenceParams, satSequence
+
+def find_tr(dt, dutyCycle, theta, avePower):
+    ## Returns the pulse duration time required to satisfy avePower and theta requirements
+    ## Based on theory from http://onlinelibrary.wiley.com/doi/10.1002/mrm.22884/epdf
+    p1 = 0.4279990617406086
+    p2 = 0.3037023079606614
+    tr = np.sqrt(p2/dutyCycle)*np.pi*theta/(180*gamma*p1*avePower)
+
+    return tr
 
 
