@@ -1,7 +1,9 @@
 ##Collection of code to simulate CEST sequences
 
 import numpy as np
-
+import scipy.optimize
+from scipy.integrate import ode
+import timeit
 
 gamma = 2*np.pi*42.6e6 # rad/(s T)
 B0 = 7.0 #Tesla
@@ -217,7 +219,7 @@ def setAlterFreqs():
     B0 = 7.0 #Tesla
     omega0 = gamma * B0
     ppms = np.array(freqs)/omega0*1e6
-    ppmsorted = sort(ppms)
+    ppmsorted = np.sort(ppms)
     inds = [list(ppms).index(c) for c in ppmsorted]
 
     return freqs, ppmsorted, inds

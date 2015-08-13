@@ -1,7 +1,9 @@
 ##Collection of code to simulate CEST sequences
 
 import numpy as np
-
+import scipy.optimize
+from scipy.integrate import ode
+import timeit
 
 gamma = 2*np.pi*42.6e6 # rad/(s T)
 B0 = 7.0 #Tesla
@@ -245,17 +247,7 @@ def h_residual_Zspectrum_N(params,
     
     return np.abs(y_data - zspectrum_N(params,w))
 
-# first is amplitude
-# then is the peak position in ppm
-# line width (ppm)
-# fourth parameter is the baseline shift, usually 1 if normalized
 
-param_dict = {'water': [-.7, 0,0.6],
-              'A' : [-0.05,3,.4]}
-
-params_passed = [1.0]+\
-                param_dict['water']+\
-                param_dict['A']
 
 ###################################################################################################################
 ################################ Starting Multi-Pool/Pulsed-Saturation Code #######################################
