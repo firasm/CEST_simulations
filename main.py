@@ -315,7 +315,7 @@ def predefinedSatSequence(dt, tr, dutyCycle, n, theta, pulseData):
     c1 = 0.147e-6*(1e-3/dt)
     gamma = 2*np.pi*42.6e6
     x = np.linspace((tr-dutyCycle*tr)/2, (tr+dutyCycle*tr)/2, tr*dutyCycle)
-    
+    B1max = c1*theta/(tr*dutyCycle)
 
     y = []
     for i in range(len(x)):
