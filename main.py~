@@ -197,7 +197,9 @@ def Zspectrum(freqs,
     signals = []
     Mresults = []
     for freq in freqs:
-        print(freq)
+	percent_done = freqs.index(freq)/len(freqs)*100
+	freqppm = freq/(2*np.pi*42.6e6*7.0)*1e6
+        print('offset = {0} ppm, {1}% done'.format(freqppm, percent_done))
         sequenceParams[-1] = freq
         Mresult, signal = cestSequence(Mstart, physicsVariables, sequenceParams)
         Mstart = Mresult[-1,:]
@@ -247,17 +249,7 @@ def h_residual_Zspectrum_N(params,
     
     return np.abs(y_data - zspectrum_N(params,w))
 
-# first is amplitude
-# then is the peak position in ppm
-# line width (ppm)
-# fourth parameter is the baseline shift, usually 1 if normalized
 
-param_dict = {'water': [-.7, 0,0.6],
-              'A' : [-0.05,3,.4]}
-
-params_passed = [1.0]+\
-                param_dict['water']+\
-                param_dict['A']
 
 ###################################################################################################################
 ################################ Starting Multi-Pool/Pulsed-Saturation Code #######################################
@@ -280,7 +272,7 @@ def setCESTdefaultsMP(dt = 1e-4,
                       avePower = 1.0e-6,
                       dutyCycle = 0.5,
                       n = 80,
-                      theta = 360,
+                      theta = 360
                       ):
     
     m = PElines/accFactor
@@ -305,12 +297,8 @@ def setCESTdefaultsMP(dt = 1e-4,
     omega1 = gamma*satSequence
     
     sequenceParams = [satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta]
-    physicsVariables = [B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges]
+    physicsVariables = [B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges, tr_pulse]
 
-    
-    #print 'sequenceParams = [satDur = {0}, ti = {1}, tacq = {2}, tpresat = {3}, accFactor = {4}, tinterfreq = {5}, hardTheta = {6}, m = {7}, dt = {8}, delta = {9}]'.format(satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta)
-    #print 'physicsVariables = [B0 = {0}, omega0 = {1}, omega1 = {2}, M0w = {3}, relaxationTimes = {4}, exchangeRates = {5}, \
-    #relativeConcentrations = {6}, resonanceFrequencies = {7}, reverseEchanges = {8}]'.format(B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges)
     return Mstart, physicsVariables, sequenceParams, satSequence
 
 def find_tr(dt, dutyCycle, theta, avePower):
@@ -323,7 +311,7 @@ def find_tr(dt, dutyCycle, theta, avePower):
     return tr
 
 def predefinedSatSequence(dt, tr, dutyCycle, n, theta, pulseData):
-    ## Generates the B1 magnitude over time, to be fed into cestSequence
+    ## Generates a time array of B1 magnitude, to be fed into cestSequence
 
     c1 = 0.147e-6*(1e-3/dt)
     gamma = 2*pi*42.6e6
@@ -388,12 +376,25 @@ def freePrecess(McomponentHistory, t, A_fp, B_fp):
     else:
         return McomponentHistory
 
-
 def pulsedCEST(Mstart, physicsVariables, sequenceParams):
+    n = sequenceParams[-1]
+    print n
+    Mresult = []
+    for i in range(n):
+        Mhistory, signal = onePulse(Mstart, physicsVariables, sequenceParams)
+        Mstart = []
+        print(shape(Mhistory))
+        for i in range(7):
+            Mstart.append(0) #x
+            Mstart.append(0) #y
+            Mstart.append(array(Mhistory)[i,-1,2])
+    return Mhistory, signal
+
+def onePulse(Mstart, physicsVariables, sequenceParams):
     starttimeunpack = timeit.default_timer()
     #Unpacking variables
-    [satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta] = sequenceParams
-    [B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges] = physicsVariables
+    [satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta, n] = sequenceParams
+    [B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges, tr_pulse] = physicsVariables
     [M0w, M0a, M0b, M0c, M0d, M0e, M0f] = relativeConcentrations
     [T1w, T2w, T1a, T2a, T1b, T2b, T1c, T2c, T1d, T2d, T1e, T2e, T1f, T2f] = relaxationTimes
     [kww, kaw, kbw, kcw, kdw, kew, kfw] = exchangeRates
@@ -440,6 +441,7 @@ def pulsedCEST(Mstart, physicsVariables, sequenceParams):
              cx/T2c, cy/T2c, -(M0c- cz)/T1c, dx/T2d, dy/T2d, -(M0d - dz)/T1d, ex/T2e, ey/T2e, -(M0e - ez)/T1e, fx/T2f, fy/T2f, -(M0f - fz)/T1f])
 
         dM = np.dot(np.array([dwx, dwy, dwz, dax, day, daz, dbx, dby, dbz, dcx, dcy, dcz, ddx, ddy, ddz, dex, dey, dez, dfx, dfy, dfz]),M) - B
+        
         return dM
 
     Mhistory = np.empty((1,21))
@@ -467,6 +469,7 @@ def pulsedCEST(Mstart, physicsVariables, sequenceParams):
             #Mresult[-1,2] = -Mresult[-1,2]
 
         ##################    END OF SATURATION PULSE  #####################################
+
         elapsedsat = timeit.default_timer() - starttimesat
         starttimeimaging = timeit.default_timer()
         dt = 0.001
@@ -478,8 +481,9 @@ def pulsedCEST(Mstart, physicsVariables, sequenceParams):
 
             for i in range(accFactor):
                 ##################   IMAGING SEQUENCE     ##########################################
+
                 M[-1][0:2] = [0,0] ## Spoiler Gradient
-                M = np.concatenate((M, [np.dot(yrotOneComponent(hardTheta), M[-1])]))
+                M = np.concatenate((M, [np.dot(yrot(hardTheta), M[-1])]))
                 signals.append(np.sqrt(M[-1,0]**2 + M[-1,1]**2))
                 M = freePrecess(M, tacq, A_fp, B_fp)
                 M[-1][0:2] = [0,0] ## Spoiler Gradient
@@ -489,10 +493,11 @@ def pulsedCEST(Mstart, physicsVariables, sequenceParams):
             M = freePrecess(M, tinterfreq, A_fp ,B_fp)
             Mpools.append(M)
             #Mhistory = np.concatenate((Mhistory, Mresult), 0)
+
     elapsedimaging = timeit.default_timer() - starttimeimaging
     Mhistory = Mpools     ## after acquisition, before the next frequency offset
 
-    #print('unpack = {0}, sat = {1}, imaging = {2}'.format(elapsedunpack, elapsedsat, elapsedimaging))
+    print('unpack = {0}, sat = {1}, imaging = {2}'.format(elapsedunpack, elapsedsat, elapsedimaging))
     return Mhistory, signals
 
 def ZspectrumMP(freqs, Mstart):
