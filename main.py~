@@ -388,7 +388,7 @@ def pulsedCEST(Mstart, physicsVariables, sequenceParams):
         for i in range(7):
             Mstart.append(0) #x
             Mstart.append(0) #y
-            Mstart.append(array(Mhistory)[i,-1,2])
+            Mstart.append(np.array(Mhistory)[i,-1,2])
 
     return Mhistory, signal
 
