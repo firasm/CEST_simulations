@@ -290,7 +290,7 @@ def setCESTdefaultsMP(dt = 1e-4,
         Mstart.append(0) #y
         Mstart.append(M0w*relativeConcentrations[i])
         
-    tr = find_tr(dt, dutyCycle, theta, avePower)/dt   # in seconds, divided by dt yields number of points in pulse
+    tr_pulse = find_tr(dt, dutyCycle, theta, avePower)/dt   # in seconds, divided by dt yields number of points in pulse
     satSequence = predefinedSatSequence(dt, tr, dutyCycle, n, theta, varianGaussian)
     satDur = len(satSequence)
     
