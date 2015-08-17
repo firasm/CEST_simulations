@@ -314,7 +314,7 @@ def predefinedSatSequence(dt, tr, dutyCycle, n, theta, pulseData):
     ## Generates a time array of B1 magnitude, to be fed into cestSequence
 
     c1 = 0.147e-6*(1e-3/dt)
-    gamma = 2*pi*42.6e6
+    gamma = 2*np.pi*42.6e6
     x = np.linspace((tr-dutyCycle*tr)/2, (tr+dutyCycle*tr)/2, tr*dutyCycle)
     
     B1max = c1*theta/(tr*dutyCycle)
