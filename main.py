@@ -335,7 +335,7 @@ def predefinedSatSequence(dt, tr, dutyCycle, n, theta, pulseData):
         for j in range(len(pulse)):
             satSequence.append(pulse[j])
             
-    return array(satSequence)
+    return np.array(satSequence)
 
 
 def xrotOneComponent(phi):
