@@ -500,7 +500,7 @@ def onePulse(Mstart, physicsVariables, sequenceParams):
 
     return Mhistory, signals
 
-def ZspectrumMP(freqs, Mstart):
+def ZspectrumMP(freqs, Mstart, physicsVariables, sequenceParams):
     signals = []
     Mresults = []
 
