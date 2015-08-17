@@ -379,21 +379,22 @@ def freePrecess(McomponentHistory, t, A_fp, B_fp):
 
 def pulsedCEST(Mstart, physicsVariables, sequenceParams):
     n = sequenceParams[-1]
-    print n
+
     Mresult = []
     for i in range(n):
         Mhistory, signal = onePulse(Mstart, physicsVariables, sequenceParams)
         Mstart = []
-        print(shape(Mhistory))
+
         for i in range(7):
             Mstart.append(0) #x
             Mstart.append(0) #y
             Mstart.append(array(Mhistory)[i,-1,2])
+
     return Mhistory, signal
 
 def onePulse(Mstart, physicsVariables, sequenceParams):
-    starttimeunpack = timeit.default_timer()
-    #Unpacking variables
+
+    #######  Unpacking variables #######
     [satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta, n] = sequenceParams
     [B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges, tr_pulse] = physicsVariables
     [M0w, M0a, M0b, M0c, M0d, M0e, M0f] = relativeConcentrations
@@ -403,7 +404,6 @@ def onePulse(Mstart, physicsVariables, sequenceParams):
     resonanceFrequencies = physicsVariables[-2]
     radianOffsets = [resonanceFrequencies[i]*omega0/1e6-delta for i in range(7)]
     [domegaw, domegaa, domegab, domegac, domegad, domegae, domegaf] = radianOffsets
-    elapsedunpack = timeit.default_timer() - starttimeunpack
 
     
     def dMdt(t, M, kww = kww, kaw = kaw, kbw = kbw, kcw = kcw, kdw = kdw, kew = kew, kfw = kfw,
@@ -449,7 +449,7 @@ def onePulse(Mstart, physicsVariables, sequenceParams):
     Mhistory[0,:] = Mstart
     signals = []
     counter = 0
-    starttimesat = timeit.default_timer()
+
     for m in range(m):
         ################    SATURATION PULSE    ##################################    
         Mresult = np.empty((int(satDur),21))
@@ -471,8 +471,8 @@ def onePulse(Mstart, physicsVariables, sequenceParams):
 
         ##################    END OF SATURATION PULSE  #####################################
 
-        elapsedsat = timeit.default_timer() - starttimesat
-        starttimeimaging = timeit.default_timer()
+
+
         dt = 0.001
         Mpools = []
         for i in range(7): #Evolve each pool separately
@@ -484,7 +484,7 @@ def onePulse(Mstart, physicsVariables, sequenceParams):
                 ##################   IMAGING SEQUENCE     ##########################################
 
                 M[-1][0:2] = [0,0] ## Spoiler Gradient
-                M = np.concatenate((M, [np.dot(yrot(hardTheta), M[-1])]))
+                M = np.concatenate((M, [np.dot(yrotOneComponent(hardTheta), M[-1])]))
                 signals.append(np.sqrt(M[-1,0]**2 + M[-1,1]**2))
                 M = freePrecess(M, tacq, A_fp, B_fp)
                 M[-1][0:2] = [0,0] ## Spoiler Gradient
@@ -495,10 +495,9 @@ def onePulse(Mstart, physicsVariables, sequenceParams):
             Mpools.append(M)
             #Mhistory = np.concatenate((Mhistory, Mresult), 0)
 
-    elapsedimaging = timeit.default_timer() - starttimeimaging
+
     Mhistory = Mpools     ## after acquisition, before the next frequency offset
 
-    print('unpack = {0}, sat = {1}, imaging = {2}'.format(elapsedunpack, elapsedsat, elapsedimaging))
     return Mhistory, signals
 
 def ZspectrumMP(freqs, Mstart):
