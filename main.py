@@ -277,7 +277,7 @@ def setCESTdefaultsMP(dt = 1e-4,
     
     m = PElines/accFactor
     
-    gamma = 2*pi*42.6e6 # rad/(s T)
+    gamma = 2*np.pi*42.6e6 # rad/(s T)
     B0 = 7.0 #Tesla
     omega0 = gamma * B0
 
