@@ -505,13 +505,11 @@ def ZspectrumMP(freqs, Mstart, physicsVariables, sequenceParams):
     Mresults = []
 
     for freq in freqs:
-        print(freq)
         sequenceParams[-2] = freq
         n = sequenceParams[-1]
-	percent_done = freqs.index(freq)/len(freqs)*100
+	percent_done = round(float(freqs.index(freq))/float(len(freqs)),2)*100
 	freqppm = freq/(2*np.pi*42.6e6*7.0)*1e6
         print('offset = {0} ppm, {1}% done'.format(freqppm, percent_done))
-        print n
         Mresult, signal = pulsedCEST(Mstart, physicsVariables, sequenceParams)
         
 	Mstart = []
