@@ -292,7 +292,7 @@ def setCESTdefaultsMP(dt = 1e-4,
         
     tr_pulse = find_tr(dt, dutyCycle, theta, avePower)/dt   # in seconds, divided by dt yields number of points in pulse
     satSequence = predefinedSatSequence(dt, tr_pulse, dutyCycle, n, theta, varianGaussian)
-    satDur = len(satSequence)
+    satDur = int(tr_pulse)
     
     omega1 = gamma*satSequence
     
@@ -509,7 +509,7 @@ def ZspectrumMP(freqs, Mstart, physicsVariables, sequenceParams):
         n = sequenceParams[-1]
 	percent_done = round(float(freqs.index(freq))/float(len(freqs)),2)*100
 	freqppm = freq/(2*np.pi*42.6e6*7.0)*1e6
-        print('offset = {0} ppm, {1}% done'.format(freqppm, percent_done))
+        print('offset = {0} ppm, {1}% done'.format(round(freqppm,2), percent_done))
         Mresult, signal = pulsedCEST(Mstart, physicsVariables, sequenceParams)
         
 	Mstart = []
