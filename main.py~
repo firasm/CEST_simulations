@@ -255,7 +255,7 @@ def h_residual_Zspectrum_N(params,
 ################################ Starting Multi-Pool/Pulsed-Saturation Code #######################################
 ###################################################################################################################
 
-def setCESTdefaultsMP(dt = 1e-4,
+def setCESTdefaultsMP(dt = 1e-3,
                       ti = 5,
                       tacq = 10,
                       tpresat = 50,
@@ -266,7 +266,7 @@ def setCESTdefaultsMP(dt = 1e-4,
                       delta = 0.0,
                       M0w = 1.0,
                       relaxationTimes = [2.0,0.05,  1.5,0.05,  1.5,0.05,  1.0,0.05,  1.0,0.05,  1.0,0.05,  1.0,0.05],
-                      relativeConcentrations = [1.0, 0.0015, 0.0015, 0, 0, 0, 0],
+                      relativeConcentrations = [1.0, 0.01, 0.01, 0, 0, 0, 0],
                       exchangeRates = np.array([0, 200., 20., 0, 0, 0, 0]),
                       resonanceFrequencies = [0., 3.5, -3.5, 0, 0, 0, 0],
                       avePower = 1.0e-6,
@@ -507,7 +507,7 @@ def ZspectrumMP(freqs, Mstart, physicsVariables, sequenceParams):
     for freq in freqs:
         sequenceParams[-2] = freq
         n = sequenceParams[-1]
-	percent_done = round(float(freqs.index(freq))/float(len(freqs)),2)*100
+	percent_done = round(float(freqs.index(freq))/float(len(freqs)),3)*100
 	freqppm = freq/(2*np.pi*42.6e6*7.0)*1e6
         print('offset = {0} ppm, {1}% done'.format(round(freqppm,2), percent_done))
         Mresult, signal = pulsedCEST(Mstart, physicsVariables, sequenceParams)
