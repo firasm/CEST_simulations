@@ -473,7 +473,7 @@ def pulsedCEST(Mstart, physicsVariables, sequenceParams):
             for i in range(accFactor):
                 ##################   IMAGING SEQUENCE     ##########################################
                 M[-1][0:2] = [0,0] ## Spoiler Gradient
-		print shape(M)
+		print np.shape(M)
                 M = np.concatenate((M, [np.dot(yrot(hardTheta), M[-1])]))
                 signals.append(np.sqrt(M[-1,0]**2 + M[-1,1]**2))
                 M = freePrecess(M, tacq, A_fp, B_fp)
