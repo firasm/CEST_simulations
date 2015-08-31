@@ -118,8 +118,8 @@ def freePrecessTwoPool(Mresult,
 
 
 def cestSequence(Mstart, 
-                    physicsVariables, 
-                    sequenceParams):
+                 physicsVariables, 
+                 sequenceParams):
     ## Takes a starting magnetization state and evolves it under the influence of a saturation pulse and imaging sequence
 
     [satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta] = sequenceParams
@@ -127,15 +127,16 @@ def cestSequence(Mstart,
     
     
     def dMdtTwoPool(t, M_vec, M0a = M0a, M0b = M0b, T1a = T1a, T2a = T2a, T1b = T1b, T2b = T2b,
-            ka = ka, kb = kb, domegaa=-delta, domegab=-delta-domegaSpecies, omega1=omega1):
+                    ka = ka, kb = kb, domegaa=-delta, domegab=-delta-domegaSpecies, omega1=omega1):
 
         A = np.array([[-1./T2a - ka, kb,  domegaa, 0, 0, 0, 0],
-                         [ka, -1./T2b - kb, 0, domegab, 0, 0 , 0],
-                         [-domegaa, 0, -1./T2a-ka, kb, omega1, 0, 0],
-                         [0, -domegab, ka, -1./T2b-kb, 0, omega1, 0],
-                         [0, 0, -omega1, 0, -1./T1a - ka, kb, M0a/T1a],
-                         [0, 0, 0, -omega1, ka, -1./T1b - kb, M0b/T1b],
-                         [0, 0, 0, 0, 0, 0,0]])
+                      [ka, -1./T2b - kb, 0, domegab, 0, 0 , 0],
+                      [-domegaa, 0, -1./T2a-ka, kb, omega1, 0, 0],
+                      [0, -domegab, ka, -1./T2b-kb, 0, omega1, 0],
+                      [0, 0, -omega1, 0, -1./T1a - ka, kb, M0a/T1a],
+                      [0, 0, 0, -omega1, ka, -1./T1b - kb, M0b/T1b],
+                      [0, 0, 0, 0, 0, 0,0]])
+
         return np.dot(A,M_vec)
 
 
@@ -171,7 +172,9 @@ def cestSequence(Mstart,
         Mresult = freePrecessTwoPool(Mresult, ti, A_fp, B_fp)## between sat pulse and aquisition pulse
         
         for i in range(accFactor):
+
             ##################   IMAGING SEQUENCE     ##########################################
+
             Mresult[-1][0:4] = [0,0,0,0] ## Spoiler Gradient
             Mresult = np.concatenate((Mresult, [np.dot(yrot(hardTheta), Mresult[-1])]))
             signals.append(np.sqrt(Mresult[-1,0]**2 + Mresult[-1,2]**2))
@@ -180,10 +183,12 @@ def cestSequence(Mstart,
             #Mresult = freePrecessTwoPool(Mresult, tpresat, A_fp, B_fp)     ## tPresat - Does this exist? 
 
             #################     END OF IMAGING SEQUENCE     ####################################
+
         Mhistory = np.concatenate((Mhistory, Mresult), 0)
     
     Mhistory = freePrecessTwoPool(Mhistory, tinterfreq, A_fp, B_fp)     ## after acquisition, before the next frequency offset
     
+    ## This is a try/except for returning the saturation time in the findSatTime function
     try:
         return Mhistory, signals
     except:
@@ -191,7 +196,10 @@ def cestSequence(Mstart,
 
 
 def Zspectrum(freqs, 
-              Mstart, sequenceParams, physicsVariables):
+              Mstart,
+              sequenceParams, 
+              physicsVariables):
+
     ## Iterates cestSequence over a list of frequency offsets
     ## Returns the magnetization history and the signal magnitudes for each offset
     signals = []
@@ -229,7 +237,7 @@ def setAlterFreqs():
 
 def zspectrum_N(params,
                 freqs):
-    
+    #This is for fitting. Returns a Lorentzian lineshape given parameters found using h_residual_Zspectrum
     arr = empty_like(freqs)*0
     shift =  params[0]
     
@@ -398,8 +406,10 @@ def pulsedCEST(Mstart, physicsVariables, sequenceParams):
              domegad = domegad, domegae = domegae, domegaf = domegaf,
              T1w = T1w, T2w = T2w, T1a = T1a, T2a = T2a, T1b = T1b, T2b = T2b, T1c = T1c, T2c = T2c,
              T1d = T1d, T2d = T2d, T1e = T1e, T2e = T2e, T1f = T1f, T2f = T2f, omega1=omega1):
+	## This is the time evolution matrix for all three spatial components of each of 7 spin pools
+
         idx = int(t/dt)
-        #if idx == 1000
+
         [wx, wy, wz, ax, ay, az, bx, by, bz, cx, cy, cz, dx, dy, dz, ex, ey, ez, fx, fy, fz] = M
 
         dwx = [-(kwa+kwb+kwc+kwd+kwe+kwf), domegaw, 0, kaw, 0, 0, kbw, 0, 0, kcw, 0, 0, kdw, 0, 0, kew, 0, 0, kfw, 0, 0]
@@ -429,7 +439,7 @@ def pulsedCEST(Mstart, physicsVariables, sequenceParams):
 
         dM = np.dot(np.array([dwx, dwy, dwz, dax, day, daz, dbx, dby, dbz, dcx, dcy, dcz, ddx, ddy, ddz, dex, dey, dez, dfx, dfy, dfz]),M) - B
         
-        ## Crusher gradient
+        ## Crusher gradient. Turned off unless using CERT
         #if tr*dt != 0.0:
         #    if round(t,5)%(round(tr*dt,5)) < 0.00001:
         #        dM[0],dM[1],dM[3],dM[4],dM[6],dM[7],dM[9],dM[10],dM[12],dM[13],dM[15],dM[16],dM[18],dM[19] = np.array([-wx, -wy, -ax, -ay, -bx,-by,-cx,-cy,-dx,-dy,-ex,-ey,-fx,-fy])/dt/dt
@@ -441,6 +451,7 @@ def pulsedCEST(Mstart, physicsVariables, sequenceParams):
     signals = []
     counter = 0
     starttimesat = timeit.default_timer()
+
     for m in range(m):
         ################    SATURATION PULSE    ##################################    
         Mresult = np.empty((int(satDur),21))
@@ -456,11 +467,9 @@ def pulsedCEST(Mstart, physicsVariables, sequenceParams):
             t+= dt
             indx += 1
             
-        #if delta > 0.:
-            #Mresult[-1,0] = -Mresult[-1,0]
-            #Mresult[-1,2] = -Mresult[-1,2]
 
         ##################    END OF SATURATION PULSE  #####################################
+
         elapsedsat = timeit.default_timer() - starttimesat
         starttimeimaging = timeit.default_timer()
         dt = 0.001
