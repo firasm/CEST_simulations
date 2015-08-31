@@ -494,8 +494,7 @@ def ZspectrumMP(freqs, Mstart, physicsVariables, sequenceParams):
     Mresults = []
 
     for freq in freqs:
-        sequenceParams[-2] = freq
-        n = sequenceParams[-1]
+        sequenceParams[-1] = freq
 	percent_done = round(float(freqs.index(freq))/float(len(freqs)),3)*100
 	freqppm = freq/(2*np.pi*42.6e6*7.0)*1e6
         print('offset = {0} ppm, {1}% done'.format(round(freqppm,2), percent_done))
