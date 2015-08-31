@@ -424,7 +424,7 @@ def pulsedCEST(Mstart, physicsVariables, sequenceParams):
         dfy = [0, kwf, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -domegaf, -kfw, omega1[idx]]
         dfz = [0, 0, kwf, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -omega1[idx], -kfw]
 
-        B = array([wx/T2w, wy/T2w, -(M0w - wz)/T1w, ax/T2a, ay/T2a, -(M0a - az)/T1a,  bx/T2b, by/T2b, -(M0b - bz)/T1b,  
+        B = np.array([wx/T2w, wy/T2w, -(M0w - wz)/T1w, ax/T2a, ay/T2a, -(M0a - az)/T1a,  bx/T2b, by/T2b, -(M0b - bz)/T1b,  
              cx/T2c, cy/T2c, -(M0c- cz)/T1c, dx/T2d, dy/T2d, -(M0d - dz)/T1d, ex/T2e, ey/T2e, -(M0e - ez)/T1e, fx/T2f, fy/T2f, -(M0f - fz)/T1f])
 
         dM = np.dot(np.array([dwx, dwy, dwz, dax, day, daz, dbx, dby, dbz, dcx, dcy, dcz, ddx, ddy, ddz, dex, dey, dez, dfx, dfy, dfz]),M) - B
