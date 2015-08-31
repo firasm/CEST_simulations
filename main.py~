@@ -297,7 +297,7 @@ def setCESTdefaultsMP(dt = 1e-3,
     omega1 = gamma*satSequence
     
     sequenceParams = [satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta]
-    physicsVariables = [B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges, tr_pulse]
+    physicsVariables = [B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges]
 
     return Mstart, physicsVariables, sequenceParams, satSequence
 
