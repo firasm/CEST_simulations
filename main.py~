@@ -307,7 +307,7 @@ def setCESTdefaultsMP(dt = 1e-3,
     sequenceParams = [satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta]
     physicsVariables = [B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges]
 
-    return Mstart, physicsVariables, sequenceParams, satSequence
+    return Mstart, physicsVariables, sequenceParams, satSequence, allParams
 
 def find_tr(dt, dutyCycle, theta, avePower):
     ## Returns the pulse duration time required to satisfy avePower and theta requirements
@@ -517,6 +517,16 @@ def ZspectrumMP(freqs, Mstart, physicsVariables, sequenceParams):
         signals.append(signal)
 
     return signals, Mresults
+
+def listParams(allParams):
+    [sequenceParams, physicsVariables, satSequence, avePower, dutyCycle, n, theta, tr] = allParams
+    [satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta] = sequenceParams
+    [B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges] = physicsVariables
+    print ('Saturation Duration:  {0} s \nInter-frequency Delay: {1} s \ndt: {2}s \n'.format(satDur*dt, tinterfreq*1e-3, dt ))
+    print ('Relaxation Times: {0} s \nExchange Rates: {1} s^-1 \nRelative Concentrations {2} \n'.format(relaxationTimes, exchangeRates, relativeConcentrations ))
+    print ('Resonance Frequencies: {0} ppm '.format(resonanceFrequencies))
+    print ('Average Pulse Power: {0} uT\nDuty Cycle: {1} \nNumber of Pulses: {2} \n'.format(avePower, dutyCycle, n))
+    print ('One-Pulse Flip Angle: {0} uT\nOne-Pulse Repetition time: {1}ms \n'.format(theta, int(tr)))
 
 
 ## This is the shape of the standard Varian gaussian pulse
