@@ -520,6 +520,7 @@ def ZspectrumMP(freqs, Mstart, physicsVariables, sequenceParams):
     return signals, Mresults
 
 def listParams(allParams):
+    ## Prints important parameters
     [sequenceParams, physicsVariables, satSequence, avePower, dutyCycle, n, theta, tr] = allParams
     [satDur, ti, tacq, tpresat, accFactor, tinterfreq, hardTheta, m, dt, delta] = sequenceParams
     [B0, omega0, omega1, M0w, relaxationTimes, exchangeRates, relativeConcentrations, resonanceFrequencies, reverseExchanges] = physicsVariables
